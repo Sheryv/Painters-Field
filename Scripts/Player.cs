@@ -10,6 +10,13 @@ namespace Assets.Scripts
         // Use this for initialization
         void Start()
         {
+
+        }
+
+        public void SetUp()
+        {
+            SpriteRenderer[] renderer = GetComponentsInChildren<SpriteRenderer>();
+            renderer[1].color = PlayerColor;
         }
 
         // Update is called once per frame
