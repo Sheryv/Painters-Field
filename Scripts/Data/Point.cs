@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace Assets.Scripts.Data
 {
@@ -15,6 +16,12 @@ namespace Assets.Scripts.Data
         {
             X = x;
             Y = y;
+        }
+
+        public Rect GetRect()
+        {
+            Rect r = new Rect(0,0,X,Y);
+            return r;
         }
     }
 }

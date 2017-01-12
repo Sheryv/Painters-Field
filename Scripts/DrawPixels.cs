@@ -13,6 +13,7 @@ namespace Assets.Scripts
         [SerializeField] private SpriteRenderer fieldRenderer;
         [SerializeField] private RenderTexture canvasTexture;
         [SerializeField] private Material material;
+        [SerializeField]private int drawDistance;
         // [SerializeField] public Color Color;
         private float distanceSquare;
         private Texture2D tempTexture2D;
@@ -20,14 +21,14 @@ namespace Assets.Scripts
         // Use this for initialization
         private void Start()
         {
-            gc = GameController.Instance;
+            gc = GameObject.FindWithTag("GameCotroller").GetComponent<GameController>();
             points = new List<Point>();
         }
 
         public void Prepare()
         {
             CreateClean();
-            distanceSquare = gc.DrawDistance*gc.DrawDistance;
+            distanceSquare = drawDistance*drawDistance;
             SetPointsTemplateArray();
         }
 
@@ -54,11 +55,11 @@ namespace Assets.Scripts
         private void Update()
         {
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (GameController.Debugging)
+            if (Master.Debugging)
             {
                 if (Input.GetKeyDown(KeyCode.M))
                 {
-                    if(GameController.Instance.GameState == GameStates.Playing)
+                    if(Master.GetState() == GameStates.Playing)
                         DrawColors();
                 }
             }
@@ -68,18 +69,18 @@ namespace Assets.Scripts
         {
             Player player;
             Texture2D tex = sprite.texture;
-            for (int pl = 0; pl < GameController.Instance.Players.Count; pl++)
+            for (int pl = 0; pl < gc.GetPlayers().Count; pl++)
             {
                 int plY;
                 int plX;
-                player = GameController.Instance.Players[pl];
-                if (GameController.Instance.IsPortraitMode)
-                {
-                    plY = (int) (player.transform.localPosition.x*100);
-                    plX = (int) (player.transform.localPosition.y*100);
-                    plY = tex.height - plY;
-                }
-                else
+                player = gc.GetPlayers()[pl];
+//                if (gc.IsPortraitMode)
+//                {
+//                    plY = (int) (player.transform.localPosition.x*100);
+//                    plX = (int) (player.transform.localPosition.y*100);
+//                    plY = tex.height - plY;
+//                }
+//                else
                 {
                     plX = (int) (player.transform.localPosition.x*100);
                     plY = (int) (player.transform.localPosition.y*100);
@@ -93,7 +94,7 @@ namespace Assets.Scripts
                     int x = point.X + plX;
                     int y = point.Y + plY;
                     //     if (tex.GetPixel(x, y) != player.PlayerColor)
-                    tex.SetPixel(x, y, player.PlayerColor);
+                    tex.SetPixel(x, y, player.Pattern.PlayerColor);
                 }
                 /*               for (int i = 0; i < tex.height; i++)
                 {
@@ -101,7 +102,7 @@ namespace Assets.Scripts
                     for (int width = 0; width < tex.width; width++)
                     {
                         float d = DistanceSquare(x, y, width, height);
-                        if (d < gc.DrawDistanceSquare)
+                        if (d < drawDistanceSquare)
                         {
                             // Debug.Log("pix "+j+" "+h);
                             if (tex.GetPixel(width, height) != player.PlayerColor)
@@ -121,18 +122,18 @@ namespace Assets.Scripts
         {
             Player player;
             Texture2D tex = sprite.texture;
-            for (int pl = 0; pl < GameController.Instance.Players.Count; pl++)
+            for (int pl = 0; pl < gc.GetPlayers().Count; pl++)
             {
                 int plY;
                 int plX;
-                player = GameController.Instance.Players[pl];
-                if (GameController.Instance.IsPortraitMode)
-                {
-                    plY = (int) (player.transform.localPosition.x*100);
-                    plX = (int) (player.transform.localPosition.y*100);
-                    plY = tex.height - plY;
-                }
-                else
+                player = gc.GetPlayers()[pl];
+//                if (gc.IsPortraitMode)
+//                {
+//                    plY = (int) (player.transform.localPosition.x*100);
+//                    plX = (int) (player.transform.localPosition.y*100);
+//                    plY = tex.height - plY;
+//                }
+//                else
                 {
                     plX = (int) (player.transform.localPosition.x*100);
                     plY = (int) (player.transform.localPosition.y*100);
@@ -146,7 +147,7 @@ namespace Assets.Scripts
                     int x = point.X + plX;
                     int y = point.Y + plY;
                     //     if (tex.GetPixel(x, y) != player.PlayerColor)
-                    tex.SetPixel(x, y, player.PlayerColor);
+                    tex.SetPixel(x, y, player.Pattern.PlayerColor);
                 }
                 /*               for (int i = 0; i < tex.height; i++)
                 {
@@ -154,7 +155,7 @@ namespace Assets.Scripts
                     for (int width = 0; width < tex.width; width++)
                     {
                         float d = DistanceSquare(x, y, width, height);
-                        if (d < gc.DrawDistanceSquare)
+                        if (d < drawDistanceSquare)
                         {
                             // Debug.Log("pix "+j+" "+h);
                             if (tex.GetPixel(width, height) != player.PlayerColor)
@@ -187,7 +188,7 @@ namespace Assets.Scripts
 
         private void SetPointsTemplateArray()
         {
-            int radius = gc.DrawDistance;
+            int radius = drawDistance;
             for (int y = -radius; y < radius; y++)
             {
                 for (int x = -radius; x < radius; x++)
@@ -199,7 +200,7 @@ namespace Assets.Scripts
                     }
                 }
             }
-            Debug.Log("Points ready for dist " + gc.DrawDistance + " | count: " + points.Count);
+            Debug.Log("Points ready for dist " + drawDistance + " | count: " + points.Count);
         }
 
         private static float DistanceSquare(float x, float y, float x2, float y2)
