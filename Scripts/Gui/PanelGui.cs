@@ -6,7 +6,7 @@ namespace Assets.Scripts.Gui
     public class PanelGui : MonoBehaviour
     {
         //   private Animator animator;
-
+        public bool ShouldSavePrefsOnClose;
 
         public void DeacitvatePanel()
         {
@@ -17,6 +17,10 @@ namespace Assets.Scripts.Gui
         {
             Animator animator = GetComponent<Animator>();
             animator.SetTrigger(MenuController.DeactivateTrigger);
+            if (ShouldSavePrefsOnClose)
+            {
+            Master.Instance.Preferences.Save();
+            }
         }
 
         public void CloseActive()

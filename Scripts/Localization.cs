@@ -32,6 +32,11 @@ namespace Assets.Scripts
             }
         }
 
+        public static string LocalCode()
+        {
+            return "en";
+        }
+
         public static string GetLoc(string key)
         {
             if (LocalizationDictionary.ContainsKey(key))
@@ -55,6 +60,8 @@ namespace Assets.Scripts
             {"ui.editnick", "Edit Nick"},
             {"ui.host", "Host"},
             {"ui.back", "Back"},
+            {"ui.ok", "OK"},
+            {"ui.resume", "Resume"},
             {"ui.exit", "Exit"},
             {"ui.singleplayer", "Singleplayer"},
             {"ui.save", "Save"},

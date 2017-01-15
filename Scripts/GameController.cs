@@ -100,14 +100,11 @@ namespace Assets.Scripts
                 MatchTime -= Time.deltaTime;
             }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                Master.Pause();
-            }
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                Master.Pause();
-            }
+
+//            if (Input.GetKeyDown(KeyCode.P))
+//            {
+//                Master.Pause();
+//            }
 
             if (MatchTime <= 0)
             {
@@ -138,7 +135,6 @@ namespace Assets.Scripts
         public IEnumerator BeginGame(float delay)
         {
             yield return new WaitForSeconds(delay);
-            GetComponent<AudioSource>().Play();
             Gui.FinishText.gameObject.SetActive(false);
             Gui.PanelMain.SetActive(false);
             texture = new RenderTexture(TextureSize.X, TextureSize.Y, 24);
@@ -166,7 +162,7 @@ namespace Assets.Scripts
             AudioSource ad = GetComponent<AudioSource>();
             ad.clip = Gui.BackgroundClips[UnityEngine.Random.Range(0, 2)];
             ad.Play();
-            Master.GetAnalytics().LogEvent("testCat", Data.Data.EventAction, "Event_Name_Game_Start", 9);
+            Wd.EventLogGamePlayInfo("Match Start - Players Count "+players.Count+" | "+Master.Instance.MatchData.RoundsCount, players.Count);
             Master.SetState(GameStates.Playing);
             if (MatchBeginEvent != null) MatchBeginEvent();
             MatchTime = Master.Instance.MatchData.MatchDuration;
@@ -365,6 +361,9 @@ namespace Assets.Scripts
             }
             GetPlayers()[winnerIndex].Pattern.RewardsCount++;
             if (MatchFinishEvent != null) MatchFinishEvent.Invoke(winnerIndex);
+
+            Wd.EventLogGamePlayInfo("Match Finish - Winner", winnerIndex);
+
         }
 
         private int GetPlayerIndexWithColor(Color32 pixel)

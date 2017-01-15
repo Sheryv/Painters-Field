@@ -14,6 +14,8 @@ namespace Assets.Scripts
     {
         public static int DeactivateTrigger;
 
+
+        public GameObject MainPanelHolder;
         public PanelGui ActivePanel;
         public PanelGui PreviousPanel;
 
@@ -46,21 +48,29 @@ namespace Assets.Scripts
         public void OnDisable()
         {
             Master.Instance.Preferences.NickChangedEvent -= PreferencesOnNickChangedEvent;
-            
+            Master.Instance.Preferences.SoundVolumeChangedEvent -= PreferencesOnSoundVolumeChangedEvent;
+
         }
 
         private void PreferencesOnNickChangedEvent(string s)
         {
             PlayerPattern.GetLocalPlayerPattern().PlayerName = s;
+            PlayerNickTextSingle.text = s;
             UpdateInLobbyPlayerList();
         }
 
         public void OnEnable()
         {
             Master.Instance.Preferences.NickChangedEvent += PreferencesOnNickChangedEvent;
+            Master.Instance.Preferences.SoundVolumeChangedEvent += PreferencesOnSoundVolumeChangedEvent;
             ConfigDurationText.text = Master.Instance.MatchData.MatchDuration.ToString();
+            SoundVolumeSlider.value = Master.Instance.Preferences.SoundVolume;
         }
 
+        private void PreferencesOnSoundVolumeChangedEvent(float f)
+        {
+            AudioListener.volume = f;
+        }
 
 
         //        public void EClosePanel(GameObject panel)
@@ -195,7 +205,6 @@ namespace Assets.Scripts
         {
             //  InputField field = GetComponent<InputField>();
             Master.Instance.Preferences.Nick = input.text;
-            PlayerNickTextSingle.text = input.text;
         }
 
         public void EIncreaseRounds()
@@ -246,6 +255,11 @@ namespace Assets.Scripts
             selectAudio.Play();
         }
 
+        public void EChangeVolume()
+        {
+            Master.Instance.Preferences.SoundVolume = SoundVolumeSlider.normalizedValue;
+        }
+
         private void StartMatch(List<PlayerPattern> patterns)
         {
             Master.Instance.LoadPlayersPatterns(patterns);
@@ -279,6 +293,7 @@ namespace Assets.Scripts
         public Text VersionLabel;
         public InputField IpField;
 
+        public Slider SoundVolumeSlider;
         public GameObject PlayerEntryLobbyPrefab;
         public GameObject PrizeImagePrefab;
         public VerticalLayoutGroup PlayerEntryLobbyListSingle;
@@ -291,5 +306,6 @@ namespace Assets.Scripts
         public Text ConfigDurationText;
 
         public AudioSource selectAudio;
+        public GameObject MessageBoxPrefab;
     }
 }

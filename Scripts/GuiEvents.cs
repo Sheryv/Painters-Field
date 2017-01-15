@@ -17,18 +17,30 @@ namespace Assets.Scripts
         {
             gc = GameObject.FindWithTag("GameController").GetComponent<GameController>();
             DestroyedObjectsOnRestart.Add(Master.Instance.gameObject);
-            DestroyedObjectsOnRestart.Add(Master.GetAnalytics().gameObject);
         }
 
         // Update is called once per frame
         void Start()
         {
+            if (Master.Debugging && Application.isEditor)
+            {
+                gc.Gui.SwitchControlDebugBtn.SetActive(true);
+            }
             gc.Gui.ObjectsToDisableBeforeCalc.Add(LoggingPanel.Instance.gameObject);
         }
 
         void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                Master.Pause();
+            }
             gc.Gui.MatchTimeLabel.text = string.Format("{0:0.0}", gc.MatchTime);
+        }
+
+        public void TogglePause()
+        {
+            Master.Pause();
         }
 
         public void OnEnable()

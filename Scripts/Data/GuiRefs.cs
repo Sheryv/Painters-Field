@@ -32,5 +32,7 @@ namespace Assets.Scripts.Data
         public AudioSource MatchEndAudio;
         public AudioSource PowerUpPickAudio;
         public AudioSource PowerUpEndAudio;
+
+        public GameObject SwitchControlDebugBtn;
     }
 }

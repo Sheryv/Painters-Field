@@ -45,7 +45,7 @@ namespace Assets.Scripts.Gui
        // private int id;
         private PlayerPattern pattern;
 
-//        public int Id
+//        public int MessageId
 //        {
 //            get { return id; }
 //        }

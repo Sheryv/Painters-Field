@@ -10,6 +10,9 @@ namespace Assets.Scripts.Data
     public class Prefs
     {
         private const string Key = "painters_field_key";
+        public const string StartCountKey = "StartCountKey";
+        public const string UseTimeKey = "UseTimeKey";
+        public const string ClientIdKey = "ClientIdKey";
         public event Action<string> NickChangedEvent;
         public event Action<ControlTypes> ControlTypeChangedEvent;
         public event Action<float> SoundVolumeChangedEvent;
@@ -67,6 +70,8 @@ namespace Assets.Scripts.Data
         {
             string s = JsonUtility.ToJson(this);
             PlayerPrefs.SetString(Key, s);
+            PlayerPrefs.SetInt(UseTimeKey, Master.UsingTime);
+            Wd.Log("Saving prefs | use time: "+Master.UsingTime, this);
         }
 
         public static Prefs LoadPrefs()
@@ -85,6 +90,23 @@ namespace Assets.Scripts.Data
                 p.nick = "Noname";
                 return p;
             }
+        }
+
+        public static string GetClientId()
+        {
+            if (PlayerPrefs.HasKey(ClientIdKey))
+            {
+                return PlayerPrefs.GetString(ClientIdKey);
+            }
+            StringBuilder sb = new StringBuilder();
+            byte[] b = Guid.NewGuid().ToByteArray();
+            for (int i = 0; i < b.Length; i++)
+            {
+                sb.Append(b[i].ToString("X"));
+            }
+            string k = sb.ToString();
+            PlayerPrefs.SetString(ClientIdKey, k);
+            return k;
         }
     }
 }
