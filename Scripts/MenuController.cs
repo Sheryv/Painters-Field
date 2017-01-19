@@ -31,6 +31,10 @@ namespace Assets.Scripts
         {
             VersionLabel.text = Localization.GetLoc("ui.version") + ": " + Application.version;
             PlayerNickTextSingle.text = Master.Instance.Preferences.Nick;
+            if (Master.Debugging)
+            {
+                DebugCanvas.SetActive(true);
+            }
         }
 
 
@@ -232,7 +236,6 @@ namespace Assets.Scripts
         public void EIncreaseDuration()
         {
             Master.Instance.MatchData.MatchDuration+=10;
-            Master.Instance.MatchData.Mode = MatchMode.Tournament;
             if (Master.Instance.MatchData.MatchDuration >420 )
             {
                 Master.Instance.MatchData.MatchDuration = 420;
@@ -253,6 +256,24 @@ namespace Assets.Scripts
         public void EPlayAudio()
         {
             selectAudio.Play();
+        }
+
+        public void EOpenWebsite()
+        {
+            Application.OpenURL("https://www.sheryv.tk/www");
+        }
+        public void EReportBug()
+        {
+            Application.OpenURL("https://www.sheryv.tk/www/en/ticket/bug/new");
+        }
+        public void ERequestFeature()
+        {
+            Application.OpenURL("https://www.sheryv.tk/www/en/ticket/feature/new");
+        }
+
+        public void ESetNeedShowTip()
+        {
+            Prefs.SetNeedShowTip();
         }
 
         public void EChangeVolume()
@@ -294,6 +315,7 @@ namespace Assets.Scripts
         public InputField IpField;
 
         public Slider SoundVolumeSlider;
+        public GameObject DebugCanvas;
         public GameObject PlayerEntryLobbyPrefab;
         public GameObject PrizeImagePrefab;
         public VerticalLayoutGroup PlayerEntryLobbyListSingle;
@@ -307,5 +329,6 @@ namespace Assets.Scripts
 
         public AudioSource selectAudio;
         public GameObject MessageBoxPrefab;
+        public GameObject LoadingText;
     }
 }

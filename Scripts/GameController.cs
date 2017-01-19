@@ -38,6 +38,7 @@ namespace Assets.Scripts
         public AnimationCurve AiTime;
         public AnimationCurve AiDirection;
 
+        private AudioSource audioSource;
         [SerializeField] private RenderTexture texture;
         [SerializeField] private List<Player> players;
         private NetworkStartPosition[] startPositions;
@@ -54,6 +55,7 @@ namespace Assets.Scripts
         // Use this for initialization
         private void Start()
         {
+            audioSource = GetComponent<AudioSource>();
             Master.SetState(GameStates.Paused);
             //  ChangeCameraView(IsPortraitMode);
             Wd.Log(Screen.width + " | " + Screen.height, this);
@@ -75,19 +77,19 @@ namespace Assets.Scripts
         public void OnEnable()
         {
             Master.GameStateChangedEvent += GameStateChanged;
-            Master.TickEvent += Tick;
+//            Master.TickEvent += Tick;
         }
 
+        //todo temporary disabled
         private void Tick()
         {
-            Gui.StateText.text = Master.GetState().ToString() + " " + frames;
             frames = 0;
         }
 
         public void OnDisable()
         {
             Master.GameStateChangedEvent -= GameStateChanged;
-            Master.TickEvent -= Tick;
+//            Master.TickEvent -= Tick;
             GetComponent<AudioSource>().Stop();
         }
 
@@ -122,7 +124,7 @@ namespace Assets.Scripts
             List<PlayerPattern> patterns = Master.Instance.PlayersPatterns;
             for (int i = 0; i < patterns.Count; i++)
             {
-                go = (GameObject) Instantiate(patterns[i].GetPrefab(), startPositions[i].transform.position, Quaternion.identity);
+                go = (GameObject) Instantiate(patterns[i].GetPrefab(), startPositions[i].transform.position, startPositions[i].transform.localRotation);
                 p = go.GetComponent<Player>();
                 p.SetUp(patterns[i], i);
                 players.Add(p);
@@ -137,7 +139,10 @@ namespace Assets.Scripts
             yield return new WaitForSeconds(delay);
             Gui.FinishText.gameObject.SetActive(false);
             Gui.PanelMain.SetActive(false);
-            texture = new RenderTexture(TextureSize.X, TextureSize.Y, 24);
+            if (texture == null)
+            {
+                texture = new RenderTexture(TextureSize.X, TextureSize.Y, 24);
+            }
             texture.DiscardContents();
             Gui.RenderCamera.targetTexture = texture;
             Gui.QuadMaterial.mainTexture = texture;
@@ -146,11 +151,13 @@ namespace Assets.Scripts
             Gui.ResetBufferQuad.SetActive(true);
             yield return new WaitForSeconds(0.02f);
             Gui.ResetBufferQuad.SetActive(false);
-            for (int i = 0; i < TimeBeforeMove; i++)
+//            for (int i = 0; i < TimeBeforeMove; i++)
             {
                 Gui.MatchStartAudio.Play();
                 yield return new WaitForSeconds(1f);
             }
+
+
             /*            if (!firstPlayStarted)
                         {
                             Color c = Gui.PanelMain.GetComponent<Image>().color;
@@ -159,10 +166,9 @@ namespace Assets.Scripts
                         }*/
             //  texture.DiscardContents();
             //firstPlayStarted = true;
-            AudioSource ad = GetComponent<AudioSource>();
-            ad.clip = Gui.BackgroundClips[UnityEngine.Random.Range(0, 2)];
-            ad.Play();
-            Wd.EventLogGamePlayInfo("Match Start - Players Count "+players.Count+" | "+Master.Instance.MatchData.RoundsCount, players.Count);
+            audioSource.clip = Gui.BackgroundClips[UnityEngine.Random.Range(0, Gui.BackgroundClips.Count)];
+            audioSource.Play();
+            Wd.EventLogGamePlayInfo("Match Start - Players Count " + players.Count + " | " + Master.Instance.MatchData.RoundsCount, players.Count);
             Master.SetState(GameStates.Playing);
             if (MatchBeginEvent != null) MatchBeginEvent();
             MatchTime = Master.Instance.MatchData.MatchDuration;
@@ -171,7 +177,7 @@ namespace Assets.Scripts
         public void Restart(float delay)
         {
             if (MatchRestartEvent != null) MatchRestartEvent();
-            GetComponent<AudioSource>().Stop();
+            audioSource.Stop();
 
             for (int i = 0; i < players.Count; i++)
             {
@@ -212,10 +218,15 @@ namespace Assets.Scripts
             if (state == GameStates.Paused)
             {
                 Gui.PanelMain.SetActive(true);
+                audioSource.Pause();
             }
             else if (state == GameStates.Playing)
             {
                 Gui.PanelMain.SetActive(false);
+                if (!audioSource.isPlaying)
+                {
+                    audioSource.UnPause();
+                }
             }
         }
 
@@ -363,7 +374,6 @@ namespace Assets.Scripts
             if (MatchFinishEvent != null) MatchFinishEvent.Invoke(winnerIndex);
 
             Wd.EventLogGamePlayInfo("Match Finish - Winner", winnerIndex);
-
         }
 
         private int GetPlayerIndexWithColor(Color32 pixel)

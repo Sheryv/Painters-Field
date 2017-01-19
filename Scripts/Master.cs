@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net;
-using System.Threading;
 using Assets.Scripts.Data;
 using Assets.Scripts.Gui;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,15 +10,14 @@ namespace Assets.Scripts
 {
     public class Master : MonoBehaviour
     {
-        private static readonly string UpdateInfoUrl = "http://sheryv2.cc/app_dev.php/api/getmsg/";
-        public static bool Debugging = true;
+        public static readonly bool Debugging = false;
         public const int MaxPlayers = 4;
         public bool TestOnlyGameScene;
 
         public Dictionary<string, string> Loc2 = new Dictionary<string, string>();
 
         public static event Action<GameStates> GameStateChangedEvent;
-        public static event Action TickEvent;
+        private static event Action TickEvent;
 
 
         public static Master Instance;
@@ -52,6 +48,7 @@ namespace Assets.Scripts
 
         private void Awake()
         {
+            Debug.logger.filterLogType = LogType.Error;
             if (!Application.isEditor)
             {
                 Cursor.lockState = CursorLockMode.Locked;
@@ -115,15 +112,16 @@ namespace Assets.Scripts
         // Use this for initialization
         private void Start()
         {
-
-//            Debug.Log(DateTime.UtcNow.ToLocalTime());
-//            Debug.Log(DateTime.UtcNow.ToLocalTime().ToLongTimeString());
-//            Debug.Log(DateTime.UtcNow.ToLocalTime().ToLongDateString());
-//            Debug.Log(Data.DataRe.DateTimeToUnixSeconds(DateTime.UtcNow));
-//                        string s = JsonUtility.ToJson(ServerDataModel.Generate());
-//                        Debug.Log(s);
-//                        Debug.Log(JsonUtility.FromJson<ServerDataModel>(js).Items[0].Title);
-//            Debug.Log(JsonUtility.ToJson(new Lol() {Text = WWW.EscapeURL("<color=#0095FF>[]</color> k")}));
+            //            Debug.Log(Application.persistentDataPath);
+            //            Debug.Log(Application.dataPath);
+            //            Debug.Log(DateTime.UtcNow.ToLocalTime());
+            //            Debug.Log(DateTime.UtcNow.ToLocalTime().ToLongTimeString());
+            //            Debug.Log(DateTime.UtcNow.ToLocalTime().ToLongDateString());
+            //            Debug.Log(Data.DataRe.DateTimeToUnixSeconds(DateTime.UtcNow));
+            //                        string s = JsonUtility.ToJson(ServerDataModel.Generate());
+            //                        Debug.Log(s);
+            //                        Debug.Log(JsonUtility.FromJson<ServerDataModel>(js).Items[0].Title);
+            //            Debug.Log(JsonUtility.ToJson(new Lol() {Text = WWW.EscapeURL("<color=#0095FF>[]</color> k")}));
             Input.simulateMouseWithTouches = false;
 
             StartCoroutine(Tick());
@@ -166,7 +164,7 @@ namespace Assets.Scripts
                     "discard errors when the loaded file doesn't exist:As you've seen, there are lots of ways to organize your configuration files. You can choose one of these or even create your own custom way of organizing the files. Don't feel" +
                     " limited by the Standard Edition that comes with Symfony.For even more customization, see How to Override Symfony's default Directory Structure";
 
-                MessageBox.Create("title sd", s, null);
+                MessageBox.AddToQueue("title " + UnityEngine.Random.Range(0, 10000), s, null);
             }
             if (Input.GetKeyDown(KeyCode.M))
             {
@@ -182,11 +180,24 @@ namespace Assets.Scripts
 
         private void FirstInitialization()
         {
-            // string id = "UA-90173964-1";
-            //GoogleAnalitycsPrefab.GetComponent<GoogleAnalyticsV4>().androidTrackingCode = id;
-            googleAnalytics = Instantiate(GoogleAnalitycsPrefab).GetComponent<GoogleAnalyticsV4>();
-            // googleAnalytics.androidTrackingCode = id;
-            googleAnalytics.StartSession();
+            TextAsset asset = Resources.Load<TextAsset>("params");
+            if (asset != null)
+            {
+                Params p = JsonUtility.FromJson<Params>(asset.text);
+                if (p != null)
+                {
+                    googleAnalytics = Instantiate(GoogleAnalitycsPrefab).GetComponent<GoogleAnalyticsV4>();
+                    googleAnalytics.androidTrackingCode = p.GoogleAnalitycsUAID;
+                    googleAnalytics.bundleVersion = Application.version;
+                    googleAnalytics.SetUp();
+                    googleAnalytics.StartSession();
+                    StartCoroutine(LoadDataFromServer(p.UpdateMessageApiAddress));
+                }
+                else
+                    Wd.Log("Null Params from json", this);
+            }
+            else
+                Wd.Log("Null asset", this);
             int l = 0;
             if (PlayerPrefs.HasKey(Prefs.StartCountKey))
             {
@@ -201,13 +212,13 @@ namespace Assets.Scripts
             }
             Wd.EventLogState("ApplicationStarted", "Start Num: " + l, l);
             Wd.EventLogState("ApplicationStarted", "Use Time: " + time, time);
-            StartCoroutine(LoadDataFromServer());
         }
 
         public void StartMatch()
         {
-            SceneManager.LoadScene(1);
-            Wd.Log("Scene loaded " + SceneManager.sceneCount, this);
+            Menu.LoadingText.SetActive(true);
+            SceneManager.LoadSceneAsync(1);
+            Wd.Log("Scene loading " + SceneManager.sceneCount, this);
         }
 
         public void LoadPlayersPatterns(List<PlayerPattern> patterns)
@@ -222,24 +233,30 @@ namespace Assets.Scripts
             {
                 yield return new WaitForSeconds(1f);
                 UsingTime++;
-                if (TickEvent != null)
-                {
-                    TickEvent.Invoke();
-                }
+                //todo temporary disabled
+//                if (TickEvent != null)
+//                {
+//                    TickEvent.Invoke();
+//                }
             }
         }
 
-        private IEnumerator LoadDataFromServer()
+        private IEnumerator LoadDataFromServer(string url)
         {
-            WWW net = new WWW(UpdateInfoUrl+Prefs.GetClientId());
+            WWW net = new WWW(url + Prefs.GetClientId());
             yield return net;
             if (net.error == null)
             {
                 try
                 {
-                    ServerDataModel data = JsonUtility.FromJson<ServerDataModel>(net.text);
-                    Wd.Log("Loaded data from server with id " + DataRe.ReadableStringFromUnix(data.MessageId), this);
-                    OnDataServerLoaded(data);
+                    string json = ServerDataHolder.WrapToClass(net.text);
+                    ServerDataHolder data = JsonUtility.FromJson<ServerDataHolder>(json);
+                    if (data.Messages.Count > 0)
+                    {
+                        Wd.Log("Loaded data from server with id " + DataRe.ReadableStringFromUnix(data.Messages[0].MessageId), this);
+                        OnDataServerLoaded(data.Messages[0]);
+                    }
+                    Wd.LogWarning("Array of messages is empty " + url, this);
                 }
                 catch (Exception ex)
                 {
@@ -248,7 +265,7 @@ namespace Assets.Scripts
             }
             else
             {
-                Wd.LogWarning("Cannot connect and get json from " + UpdateInfoUrl, this);
+                Wd.LogWarning("Cannot connect and get json from " + url, this);
             }
         }
 
@@ -262,13 +279,12 @@ namespace Assets.Scripts
                 if (DataRe.UnixTimeToDateTime(data.StartDate) < DateTime.Now)
                 {
                     ServerDataModelLanguage s = data.GetWithLocal(Localization.LocalCode());
-                    MessageBox.Create(s.Title, s.Content, null);
+                    MessageBox.AddToQueue(s.Title, s.Content, null);
                 }
                 else
-                    Wd.Log("Start date is bigger than date.now | "+data, this);
+                    Wd.Log("Start date is bigger than date.now | " + data, this);
             }
-            Wd.Log("This is updated version, no message needed | "+data, this);
-            
+            Wd.Log("This is updated version, no message needed | " + data, this);
         }
 
 
@@ -345,9 +361,11 @@ namespace Assets.Scripts
 
         public static void Exit()
         {
-            GetAnalytics().StopSession();
+            if (Master.GetAnalytics() != null)
+            {
+                GetAnalytics().StopSession();
             GetAnalytics().DispatchHits();
-            GetAnalytics().Dispose();
+            }
             Application.Quit();
         }
 
@@ -362,8 +380,10 @@ namespace Assets.Scripts
 
         private void OnDestroy()
         {
-            GetAnalytics().DispatchHits();
-            GetAnalytics().Dispose();
+            if (Master.GetAnalytics() != null)
+            {
+                GetAnalytics().Dispose();
+            }
         }
 
 

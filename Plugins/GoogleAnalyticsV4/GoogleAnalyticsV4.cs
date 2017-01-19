@@ -111,8 +111,14 @@ public class GoogleAnalyticsV4 : MonoBehaviour {
 #else
   private GoogleAnalyticsMPV3 mpTracker = new GoogleAnalyticsMPV3();
 #endif
+    private bool setup = false;
 
-  void Awake() {
+
+  public void SetUp()
+  {
+      if (setup)
+          return;
+      setup = true;
     InitializeTracker ();
     if (sendLaunchEvent) {
       LogEvent("Google Analytics", "Auto Instrumentation", "Game Launch", 0);

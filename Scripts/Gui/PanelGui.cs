@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Data;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.Gui
@@ -47,6 +48,11 @@ namespace Assets.Scripts.Gui
 
         public void LobbyOpened(bool isSinglePlayer)
         {
+            if (isSinglePlayer && Prefs.IsNeedShowTip())
+            {
+                MessageBox.ShowTip(0);
+                MessageBox.ShowTip(1);
+            }
             gameObject.SetActive(true);
         }
 

@@ -138,7 +138,8 @@ namespace Assets.Scripts
             }
             string s = desc + " |> " + msg + " #|# \n" + stacktrace;
 #if !UNITY_EDITOR
-            Master.GetAnalytics().LogException(s, true);
+            if(Master.GetAnalytics() != null)
+                Master.GetAnalytics().LogException(s, true);
 #else
             LogErr("Analitycs Log Error: " + s, Master.Instance);
 #endif
@@ -147,7 +148,8 @@ namespace Assets.Scripts
         private static void SendEvent(string cat, string action, string name, long value)
         {
 #if !UNITY_EDITOR
-            Master.GetAnalytics().LogEvent(cat, action, name, value);
+            if(Master.GetAnalytics() != null)
+                 Master.GetAnalytics().LogEvent(cat, action, name, value);
 #else
             Log("Analitycs Log: " + cat + " | " + action + " | " + name + " | " + value, Master.Instance);
 #endif

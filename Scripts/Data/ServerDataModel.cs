@@ -75,5 +75,16 @@ namespace Assets.Scripts.Data
         public string Content;
         public string SecBtnText;
     }
+    [Serializable]
+    public class ServerDataHolder
+    {
+        private const string ListFieldName = "Messages";
+        public List<ServerDataModel> Messages;
+
+        public static string WrapToClass(string json)
+        {
+            return string.Format("{{ \"{0}\": {1}}}",ListFieldName, json);
+        }
+    }
 
 }

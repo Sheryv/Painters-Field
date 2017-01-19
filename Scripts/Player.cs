@@ -194,7 +194,7 @@ namespace Assets.Scripts
             }
             if (collision.gameObject.GetComponent<Player>() != null)
             {
-                Debug.Log("Player hit: "+collision.gameObject.name);
+              //  Debug.Log("Player hit: "+collision.gameObject.name);
             }
            
         }

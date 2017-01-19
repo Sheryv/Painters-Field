@@ -5,12 +5,9 @@ namespace Assets.Scripts.Gui
 {
     public class LoggingPanel : MonoBehaviour
     {
-        [SerializeField]
-        private GameObject panel;
-        [SerializeField]
-        private Text text;
-        [SerializeField]
-        private Scrollbar scroll;
+        [SerializeField] private GameObject panel;
+        [SerializeField] private Text text;
+        [SerializeField] private Scrollbar scroll;
 
         public static LoggingPanel Instance;
 
@@ -19,21 +16,21 @@ namespace Assets.Scripts.Gui
         private const float bot = 1410f;
 
         // Use this for initialization
-        void Awake()
+        private void Awake()
         {
             Instance = this;
         }
 
         public void AddText(string message)
         {
-            text.text += message+"\n";
+            text.text += message + "\n";
             if (text.text.Length > 3000)
             {
-                text.text=text.text.Substring(200, text.text.Length-201);
+                text.text = text.text.Substring(200, text.text.Length - 201);
             }
         }
 
-       public void ToggleVisibility()
+        public void ToggleVisibility()
         {
             panel.SetActive(!panel.activeInHierarchy);
             scroll.gameObject.SetActive(!scroll.gameObject.activeInHierarchy);
@@ -48,12 +45,14 @@ namespace Assets.Scripts.Gui
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
-
-            if (Input.GetKeyDown(KeyCode.Menu))
+            if (Master.Debugging)
             {
-                ToggleVisibility();
+                if (Input.GetKeyDown(KeyCode.Menu))
+                {
+                    ToggleVisibility();
+                }
             }
         }
     }

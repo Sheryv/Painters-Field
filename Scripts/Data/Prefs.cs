@@ -13,6 +13,7 @@ namespace Assets.Scripts.Data
         public const string StartCountKey = "StartCountKey";
         public const string UseTimeKey = "UseTimeKey";
         public const string ClientIdKey = "ClientIdKey";
+        public const string TipShow = "TipShow";
         public event Action<string> NickChangedEvent;
         public event Action<ControlTypes> ControlTypeChangedEvent;
         public event Action<float> SoundVolumeChangedEvent;
@@ -87,7 +88,9 @@ namespace Assets.Scripts.Data
             {
                 Prefs p = new Prefs();
                 p.controlType = ControlTypes.Touch;
-                p.nick = "Noname";
+                p.nick = "Your nick";
+                p.soundVolume = 0.8f;
+                p.Save();
                 return p;
             }
         }
@@ -107,6 +110,27 @@ namespace Assets.Scripts.Data
             string k = sb.ToString();
             PlayerPrefs.SetString(ClientIdKey, k);
             return k;
+        }
+
+        public static bool IsNeedShowTip()
+        {
+            if (PlayerPrefs.HasKey(TipShow))
+            {
+                int s = PlayerPrefs.GetInt(TipShow);
+                bool yes = s != 0;
+                if (yes)
+                {
+                    PlayerPrefs.SetInt(TipShow, 0);
+                }
+                return  yes;
+            }
+            PlayerPrefs.SetInt(TipShow, 0);
+            return true;
+        }
+
+        public static void SetNeedShowTip()
+        {
+            PlayerPrefs.SetInt(TipShow, 1);
         }
     }
 }

@@ -26,7 +26,10 @@ namespace Assets.Scripts
             {
                 gc.Gui.SwitchControlDebugBtn.SetActive(true);
             }
+            if (Master.Debugging)
+            {
             gc.Gui.ObjectsToDisableBeforeCalc.Add(LoggingPanel.Instance.gameObject);
+            }
         }
 
         void Update()
