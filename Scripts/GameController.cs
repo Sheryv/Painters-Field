@@ -39,7 +39,6 @@ namespace Assets.Scripts
         public AnimationCurve AiDirection;
 
         private AudioSource audioSource;
-        [SerializeField] private RenderTexture texture;
         [SerializeField] private List<Player> players;
         private NetworkStartPosition[] startPositions;
         private int frames;
@@ -136,19 +135,16 @@ namespace Assets.Scripts
 
         public IEnumerator BeginGame(float delay)
         {
-            yield return new WaitForSeconds(delay);
+            RenderTexture texture = Master.Instance.RenderTexture;
             Gui.FinishText.gameObject.SetActive(false);
             Gui.PanelMain.SetActive(false);
-            if (texture == null)
-            {
-                texture = new RenderTexture(TextureSize.X, TextureSize.Y, 24);
-            }
-            texture.DiscardContents();
+           // texture.DiscardContents();
             Gui.RenderCamera.targetTexture = texture;
             Gui.QuadMaterial.mainTexture = texture;
             Gui.DisplayCreatedTextureQuad.SetActive(true);
             Gui.RenderCamera.gameObject.SetActive(true);
             Gui.ResetBufferQuad.SetActive(true);
+           // Gui.RenderCamera.Render();
             yield return new WaitForSeconds(0.02f);
             Gui.ResetBufferQuad.SetActive(false);
 //            for (int i = 0; i < TimeBeforeMove; i++)
@@ -292,7 +288,7 @@ namespace Assets.Scripts
             yield return null;
 
             tex = new Texture2D(TextureSize.X, TextureSize.Y, TextureFormat.RGB24, false);
-            RenderTexture.active = texture;
+            RenderTexture.active = Master.Instance.RenderTexture;
             Gui.RenderCamera.Render();
             //    yield return new WaitForEndOfFrame();
             tex.ReadPixels(TextureSize.GetRect(), 0, 0);

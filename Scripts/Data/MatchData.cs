@@ -8,11 +8,17 @@ namespace Assets.Scripts.Data
     [Serializable]
     public class MatchData
     {
-        public int RoundsCount = 1;
+        public int RoundsCount;
         public int CurrRound = 0;
-        public float MatchDuration = 12f;
+        public float MatchDuration;
 
         public MatchMode Mode;
+
+        public MatchData()
+        {
+            MatchDuration = 60f;
+            RoundsCount = 3;
+        }
 
 
         public bool WasLastRound()

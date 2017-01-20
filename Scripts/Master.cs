@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using Assets.Scripts.Data;
 using Assets.Scripts.Gui;
 using UnityEngine;
@@ -21,9 +22,11 @@ namespace Assets.Scripts
 
 
         public static Master Instance;
+        public static int UsingTime;
         private static GoogleAnalyticsV4 googleAnalytics;
         private static bool firstInitialized;
-        public static int UsingTime;
+
+
         public Prefs Preferences;
         public GameObject GoogleAnalitycsPrefab;
         public MatchData MatchData;
@@ -32,6 +35,8 @@ namespace Assets.Scripts
         public ClientTypes ClientType = ClientTypes.Host;
 
 
+        private Thread ThreadTexture;
+        [SerializeField] private RenderTexture renderTexture = null;
         private List<PlayerPattern> playersPatterns;
 
 
@@ -45,10 +50,18 @@ namespace Assets.Scripts
             get { return firstInitialized; }
         }
 
+        public RenderTexture RenderTexture
+        {
+            get { return renderTexture; }
+        }
+
 
         private void Awake()
         {
-            Debug.logger.filterLogType = LogType.Error;
+            if (!Debugging)
+            {
+                Debug.logger.filterLogType = LogType.Error;
+            }
             if (!Application.isEditor)
             {
                 Cursor.lockState = CursorLockMode.Locked;
@@ -68,7 +81,16 @@ namespace Assets.Scripts
                 FirstInitialization();
             }
             UsingTime = PlayerPrefs.GetInt(Prefs.UseTimeKey, 0);
+            //            if (ThreadTexture != null)
+            //            {
+            //                ThreadTexture.Start();
+            //            }
+            //            else
+            //                Wd.Log("Null thread, not started", this);
+            StartCoroutine(CreateRenderTexture());
+
         }
+
 
         public void OnDisable()
         {
@@ -149,31 +171,20 @@ namespace Assets.Scripts
         // Update is called once per frame
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.J))
+            if (Debugging)
             {
-                Menu.UpdateInLobbyPlayerList();
-            }
-
-            if (Input.GetKeyDown(KeyCode.V))
-            {
-                string s =
-                    "If you use any other configuration format, you have to define your own loader class extending it from FileLoader. When the configuration values are dynamic, you can use the PHP configuration file to execute your ow" +
-                    "n logic. In addition, you can define your own services to load configurations from databases or web services.Global Configuration FilesSome system administrators may prefer to store sensitive parameters in files outsid" +
-                    "e the project directory.Imagine that the database credentials for your website are stored in the / etc / sites / mysite.com / parameters.yml file.Loading this file is as simple as indicating the full file path when importi" +
-                    "ng it from any other configuration file:Most of the time, local developers won't have the same files that exist on the production servers. For that reason, the Config component provides the ignore_errors option to silently " +
-                    "discard errors when the loaded file doesn't exist:As you've seen, there are lots of ways to organize your configuration files. You can choose one of these or even create your own custom way of organizing the files. Don't feel" +
-                    " limited by the Standard Edition that comes with Symfony.For even more customization, see How to Override Symfony's default Directory Structure";
-
-                MessageBox.AddToQueue("title " + UnityEngine.Random.Range(0, 10000), s, null);
-            }
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                string s = "";
-                foreach (KeyValuePair<string, string> kv in Loc2)
+                if (Input.GetKeyDown(KeyCode.V))
                 {
-                    s += "{ " + kv.Key + "," + kv.Value + "},\n";
+                    string s =
+                        "If you use any other configuration format, you have to define your own loader class extending it from FileLoader. When the configuration values are dynamic, you can use the PHP configuration file to execute your ow" +
+                        "n logic. In addition, you can define your own services to load configurations from databases or web services.Global Configuration FilesSome system administrators may prefer to store sensitive parameters in files outsid" +
+                        "e the project directory.Imagine that the database credentials for your website are stored in the / etc / sites / mysite.com / parameters.yml file.Loading this file is as simple as indicating the full file path when importi" +
+                        "ng it from any other configuration file:Most of the time, local developers won't have the same files that exist on the production servers. For that reason, the Config component provides the ignore_errors option to silently " +
+                        "discard errors when the loaded file doesn't exist:As you've seen, there are lots of ways to organize your configuration files. You can choose one of these or even create your own custom way of organizing the files. Don't feel" +
+                        " limited by the Standard Edition that comes with Symfony.For even more customization, see How to Override Symfony's default Directory Structure";
+
+                    MessageBox.AddToQueue("title " + UnityEngine.Random.Range(0, 10000), s, null);
                 }
-                Debug.Log(s);
             }
         }
 
@@ -212,13 +223,40 @@ namespace Assets.Scripts
             }
             Wd.EventLogState("ApplicationStarted", "Start Num: " + l, l);
             Wd.EventLogState("ApplicationStarted", "Use Time: " + time, time);
+//            ThreadTexture = new Thread(() =>
+//            {
+//                Wd.Log("in thread", this);
+//               // if (renderTexture == null)
+//                {
+//                    Wd.Log("creating tex", this);
+//                    renderTexture = new RenderTexture(GameController.TextureSize.X, GameController.TextureSize.Y, 24);
+//                    Wd.Log("after creating tex", this);
+//                }
+//            });
+//            ThreadTexture.Start();
         }
 
-        public void StartMatch()
+        public IEnumerator StartMatch()
         {
             Menu.LoadingText.SetActive(true);
-            SceneManager.LoadSceneAsync(1);
-            Wd.Log("Scene loading " + SceneManager.sceneCount, this);
+            for (int i = 0; i < 100; i++)
+            {
+                if (RenderTexture != null)
+                {
+                    break;
+                }
+                yield return new WaitForSeconds(0.1f);
+            }
+            if (RenderTexture != null)
+            {
+                SceneManager.LoadSceneAsync(1);
+                Wd.Log("Scene loading " + SceneManager.sceneCount, this);
+            }
+            else
+            {
+                Menu.LoadingText.SetActive(false);
+                Wd.Log("Unable to get render texture", this);
+            }
         }
 
         public void LoadPlayersPatterns(List<PlayerPattern> patterns)
@@ -256,7 +294,8 @@ namespace Assets.Scripts
                         Wd.Log("Loaded data from server with id " + DataRe.ReadableStringFromUnix(data.Messages[0].MessageId), this);
                         OnDataServerLoaded(data.Messages[0]);
                     }
-                    Wd.LogWarning("Array of messages is empty " + url, this);
+                    else
+                        Wd.LogWarning("Array of messages is empty " + url, this);
                 }
                 catch (Exception ex)
                 {
@@ -316,6 +355,18 @@ namespace Assets.Scripts
             }
         }
 
+        public IEnumerator CreateRenderTexture()
+        {
+             if (renderTexture == null)
+            {
+                Wd.Log("creating tex", this);
+                yield return null;
+                renderTexture = new RenderTexture(GameController.TextureSize.X, GameController.TextureSize.Y, 24);
+                yield return null;
+                Wd.Log("after creating tex", this);
+            }
+        }
+
         public static GameStates GetState()
         {
             return Instance.GameState;
@@ -364,7 +415,7 @@ namespace Assets.Scripts
             if (Master.GetAnalytics() != null)
             {
                 GetAnalytics().StopSession();
-            GetAnalytics().DispatchHits();
+                GetAnalytics().DispatchHits();
             }
             Application.Quit();
         }

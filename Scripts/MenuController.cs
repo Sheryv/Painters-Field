@@ -35,6 +35,8 @@ namespace Assets.Scripts
             {
                 DebugCanvas.SetActive(true);
             }
+            ConfigDurationText.text = Master.Instance.MatchData.MatchDuration.ToString();
+            ConfigRoundsText.text = Master.Instance.MatchData.RoundsCount.ToString();
         }
 
 
@@ -67,7 +69,6 @@ namespace Assets.Scripts
         {
             Master.Instance.Preferences.NickChangedEvent += PreferencesOnNickChangedEvent;
             Master.Instance.Preferences.SoundVolumeChangedEvent += PreferencesOnSoundVolumeChangedEvent;
-            ConfigDurationText.text = Master.Instance.MatchData.MatchDuration.ToString();
             SoundVolumeSlider.value = Master.Instance.Preferences.SoundVolume;
         }
 
@@ -284,7 +285,7 @@ namespace Assets.Scripts
         private void StartMatch(List<PlayerPattern> patterns)
         {
             Master.Instance.LoadPlayersPatterns(patterns);
-            Master.Instance.StartMatch();
+            StartCoroutine(Master.Instance.StartMatch());
         }
 
         public void GeneratePrizeImages(int count, GameObject parnetHolder)
