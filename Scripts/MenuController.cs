@@ -77,13 +77,6 @@ namespace Assets.Scripts
             AudioListener.volume = f;
         }
 
-
-        //        public void EClosePanel(GameObject panel)
-        //        {
-        //            Animator animator = panel.GetComponent<Animator>();
-        //            animator.SetTrigger(MenuController.DeactivateTrigger);
-        //        }
-
         public void EExit()
         {
             Master.Exit();
@@ -182,7 +175,6 @@ namespace Assets.Scripts
                     entry.transform.localScale = new Vector3(1f, 1f, 1f);
                 } //todo network
             }
-            //todo show rewards
         }
 
         public void ERemovePattern(PlayerEntryLobby pattern)
@@ -193,7 +185,6 @@ namespace Assets.Scripts
 
         public void ELoadGame()
         {
-            // patterns.Add(new PlayerPattern(false, PlayerPattern.ColorsBackground[0], PlayerPattern.ColorsBasic[0], 3f, 2f)); 
             StartMatch(patterns);
         }
 
@@ -208,7 +199,6 @@ namespace Assets.Scripts
 
         public void EChangeNick(InputField input)
         {
-            //  InputField field = GetComponent<InputField>();
             Master.Instance.Preferences.Nick = input.text;
         }
 

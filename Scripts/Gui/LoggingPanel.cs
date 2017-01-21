@@ -12,8 +12,8 @@ namespace Assets.Scripts.Gui
         public static LoggingPanel Instance;
 
 
-        private const float top = -431f;
-        private const float bot = 1410f;
+        private const float Top = -431f;
+        private const float Bot = 1410f;
 
         // Use this for initialization
         private void Awake()
@@ -38,9 +38,9 @@ namespace Assets.Scripts.Gui
 
         public void OnScroll(Scrollbar sc)
         {
-            float dif = bot - top;
+            float dif = Bot - Top;
             dif = sc.value*dif;
-            dif = bot - dif;
+            dif = Bot - dif;
             text.transform.localPosition = new Vector3(text.transform.localPosition.x, dif, 0);
         }
 

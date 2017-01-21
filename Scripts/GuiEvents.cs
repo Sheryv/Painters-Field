@@ -123,7 +123,6 @@ namespace Assets.Scripts
         public void EPlayStart()
         {
             gc.Restart(0);
-           // gc.StartCoroutine(StartFirst(1,0));
         }
 
         public void EPlayAudio()
@@ -131,15 +130,14 @@ namespace Assets.Scripts
             Master.Instance.Menu.EPlayAudio();
         }
 
-        private IEnumerator StartFirst(int normal, int ai)
-        {
-            yield return new WaitForSeconds(0.1f);
-            
-          //  gc.Restart();
-           // yield return new WaitForSeconds(0.05f);
-            //gc.Restart();
-        }
-
+//        private IEnumerator StartFirst(int normal, int ai)
+//        {
+//            yield return new WaitForSeconds(0.1f);
+//            
+//          //  gc.Restart();
+//           // yield return new WaitForSeconds(0.05f);
+//            //gc.Restart();
+//        }
 
         public void ShowTable(int winner)
         {

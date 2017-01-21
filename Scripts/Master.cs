@@ -81,14 +81,7 @@ namespace Assets.Scripts
                 FirstInitialization();
             }
             UsingTime = PlayerPrefs.GetInt(Prefs.UseTimeKey, 0);
-            //            if (ThreadTexture != null)
-            //            {
-            //                ThreadTexture.Start();
-            //            }
-            //            else
-            //                Wd.Log("Null thread, not started", this);
             StartCoroutine(CreateRenderTexture());
-
         }
 
 
@@ -105,15 +98,13 @@ namespace Assets.Scripts
 
         private void OnMatchFinish(int winner)
         {
-            Wd.Log("Finish | " + winner, this);
-            //  GetComponent<AudioListener>().enabled = true;
+//            Wd.Log("Finish | " + winner, this);
         }
 
         private void OnMatchRestart()
         {
             GetAnalytics().DispatchHits();
-            Wd.Log("Restart", this);
-            // GetComponent<AudioListener>().enabled = false;
+//            Wd.Log("Restart", this);
         }
 
 
@@ -134,37 +125,11 @@ namespace Assets.Scripts
         // Use this for initialization
         private void Start()
         {
-            //            Debug.Log(Application.persistentDataPath);
-            //            Debug.Log(Application.dataPath);
-            //            Debug.Log(DateTime.UtcNow.ToLocalTime());
-            //            Debug.Log(DateTime.UtcNow.ToLocalTime().ToLongTimeString());
-            //            Debug.Log(DateTime.UtcNow.ToLocalTime().ToLongDateString());
-            //            Debug.Log(Data.DataRe.DateTimeToUnixSeconds(DateTime.UtcNow));
-            //                        string s = JsonUtility.ToJson(ServerDataModel.Generate());
-            //                        Debug.Log(s);
-            //                        Debug.Log(JsonUtility.FromJson<ServerDataModel>(js).Items[0].Title);
-            //            Debug.Log(JsonUtility.ToJson(new Lol() {Text = WWW.EscapeURL("<color=#0095FF>[]</color> k")}));
+//            Debug.Log(Data.DataRe.DateTimeToUnixSeconds(DateTime.UtcNow));
             Input.simulateMouseWithTouches = false;
-
             StartCoroutine(Tick());
             MatchData = new MatchData();
             MatchData.Mode = MatchMode.Single;
-//            Thread th = new Thread(() =>
-//            {
-//                using (var client = new WebClient())
-//                {
-//                    var contents = client.DownloadString("http://www.google.com");
-//                    string t;
-//                    if (contents.Length > 150)
-//                    {
-//                        t = contents.Substring(0, 150);
-//                    }
-//                    else
-//                        t = contents;
-//                    Wd.Log("WebPage: " + t, this);
-//                }
-//            });
-//            th.Start();
         }
 
 
@@ -177,12 +142,7 @@ namespace Assets.Scripts
                 {
                     string s =
                         "If you use any other configuration format, you have to define your own loader class extending it from FileLoader. When the configuration values are dynamic, you can use the PHP configuration file to execute your ow" +
-                        "n logic. In addition, you can define your own services to load configurations from databases or web services.Global Configuration FilesSome system administrators may prefer to store sensitive parameters in files outsid" +
-                        "e the project directory.Imagine that the database credentials for your website are stored in the / etc / sites / mysite.com / parameters.yml file.Loading this file is as simple as indicating the full file path when importi" +
-                        "ng it from any other configuration file:Most of the time, local developers won't have the same files that exist on the production servers. For that reason, the Config component provides the ignore_errors option to silently " +
-                        "discard errors when the loaded file doesn't exist:As you've seen, there are lots of ways to organize your configuration files. You can choose one of these or even create your own custom way of organizing the files. Don't feel" +
-                        " limited by the Standard Edition that comes with Symfony.For even more customization, see How to Override Symfony's default Directory Structure";
-
+                        "n logic. In addition, you can define your own services to load configurations from databases or web services.Global Configuration FilesSome system administrators may prefer to store sensitive parameters in files outsid";
                     MessageBox.AddToQueue("title " + UnityEngine.Random.Range(0, 10000), s, null);
                 }
             }
@@ -223,17 +183,6 @@ namespace Assets.Scripts
             }
             Wd.EventLogState("ApplicationStarted", "Start Num: " + l, l);
             Wd.EventLogState("ApplicationStarted", "Use Time: " + time, time);
-//            ThreadTexture = new Thread(() =>
-//            {
-//                Wd.Log("in thread", this);
-//               // if (renderTexture == null)
-//                {
-//                    Wd.Log("creating tex", this);
-//                    renderTexture = new RenderTexture(GameController.TextureSize.X, GameController.TextureSize.Y, 24);
-//                    Wd.Log("after creating tex", this);
-//                }
-//            });
-//            ThreadTexture.Start();
         }
 
         public IEnumerator StartMatch()
@@ -272,10 +221,10 @@ namespace Assets.Scripts
                 yield return new WaitForSeconds(1f);
                 UsingTime++;
                 //todo temporary disabled
-//                if (TickEvent != null)
-//                {
-//                    TickEvent.Invoke();
-//                }
+                if (TickEvent != null)
+                {
+                    TickEvent.Invoke();
+                }
             }
         }
 
@@ -338,7 +287,7 @@ namespace Assets.Scripts
 
             if (p.Nick == "")
             {
-                p.Nick = "Noname";
+                p.Nick = "Your Nick";
             }
             return p;
         }
@@ -357,13 +306,13 @@ namespace Assets.Scripts
 
         public IEnumerator CreateRenderTexture()
         {
-             if (renderTexture == null)
+            if (renderTexture == null)
             {
-                Wd.Log("creating tex", this);
+//                Wd.Log("creating tex", this);
                 yield return null;
                 renderTexture = new RenderTexture(GameController.TextureSize.X, GameController.TextureSize.Y, 24);
                 yield return null;
-                Wd.Log("after creating tex", this);
+//                Wd.Log("after creating tex", this);
             }
         }
 
@@ -468,11 +417,5 @@ namespace Assets.Scripts
     {
         Keyboard,
         Touch
-    }
-
-    [Serializable]
-    public class Lol
-    {
-        public string Text;
     }
 }

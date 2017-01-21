@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
+    /// <summary>
+    /// Class created for tests
+    /// </summary>
     public class DrawPixels : MonoBehaviour
     {
         [SerializeField] private List<Point> points;
@@ -13,7 +16,7 @@ namespace Assets.Scripts
         [SerializeField] private SpriteRenderer fieldRenderer;
         [SerializeField] private RenderTexture canvasTexture;
         [SerializeField] private Material material;
-        [SerializeField]private int drawDistance;
+        [SerializeField] private int drawDistance;
         // [SerializeField] public Color Color;
         private float distanceSquare;
         private Texture2D tempTexture2D;
@@ -21,8 +24,8 @@ namespace Assets.Scripts
         // Use this for initialization
         private void Start()
         {
-            gc = GameObject.FindWithTag("GameCotroller").GetComponent<GameController>();
-            points = new List<Point>();
+//            gc = GameObject.FindWithTag("GameCotroller").GetComponent<GameController>();
+//            points = new List<Point>();
         }
 
         public void Prepare()
@@ -36,7 +39,7 @@ namespace Assets.Scripts
         {
             Color c = new Color(1f, 1f, 1f, 0.01f);
             Texture2D bg = background.sprite.texture;
-            tempTexture2D = new Texture2D(bg.width, bg.height);//, TextureFormat.DXT5, false);
+            tempTexture2D = new Texture2D(bg.width, bg.height); //, TextureFormat.DXT5, false);
             for (int i = 0; i < tempTexture2D.height; i++)
             {
                 for (int j = 0; j < tempTexture2D.width; j++)
@@ -54,15 +57,14 @@ namespace Assets.Scripts
         // Update is called once per frame
         private void Update()
         {
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-            if (Master.Debugging)
-            {
-                if (Input.GetKeyDown(KeyCode.M))
-                {
-                    if(Master.GetState() == GameStates.Playing)
-                        DrawColors();
-                }
-            }
+//            if (Master.Debugging)
+//            {
+//                if (Input.GetKeyDown(KeyCode.M))
+//                {
+//                    if(Master.GetState() == GameStates.Playing)
+//                        DrawColors();
+//                }
+//            }
         }
 
         public void DrawColors()

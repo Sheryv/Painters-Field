@@ -21,47 +21,20 @@ namespace Assets.Scripts.Gui
             }
         };
 
-        [Serializable]
-        public class Data
-        {
-            public string title;
-            public string content;
-            public UnityAction btnClicked;
-
-            public Data(string title, string content, UnityAction btnClicked)
-            {
-                this.btnClicked = btnClicked;
-                this.content = content;
-                this.title = title;
-            }
-        }
-
-        [SerializeField] private Queue<Data> queue = new Queue<Data>();
-
         private bool isShown;
 
+        [SerializeField] private Queue<Data> queue = new Queue<Data>();
         [SerializeField] private Text contentText;
         [SerializeField] private Text titleText;
         [SerializeField] private Button okBtn;
         [SerializeField] private Button secondBtn;
         [SerializeField] private Scrollbar rect;
-        // Use this for initialization
-        private void Start()
-        {
-        }
-
-        // Update is called once per frame
-        private void Update()
-        {
-        }
 
         private void Show()
         {
-//            Debug.Log("shown " + queue.Count + " | "+isShown);
             if (!isShown && queue.Count > 0)
             {
                 Data data = queue.Dequeue();
-//                Debug.Log("removed " + data.title);
                 SetUp(data);
                 gameObject.SetActive(true);
                 isShown = true;
@@ -72,14 +45,12 @@ namespace Assets.Scripts.Gui
         {
             Data data = new Data(title, content, btnClicked);
             queue.Enqueue(data);
-//            Debug.Log("added "+title);
             Show();
         }
 
         private void Add(Data data)
         {
             queue.Enqueue(data);
-//            Debug.Log("added "+title);
             Show();
         }
 
@@ -117,6 +88,22 @@ namespace Assets.Scripts.Gui
 //            ms.transform.position = new Vector3(0,0);
             MessageBox msg = Master.Instance.Menu.MessageBoxPrefab.GetComponent<MessageBox>();
             msg.Add(title, content, btnClicked);
+        }
+
+
+        [Serializable]
+        public class Data
+        {
+            public string title;
+            public string content;
+            public UnityAction btnClicked;
+
+            public Data(string title, string content, UnityAction btnClicked)
+            {
+                this.btnClicked = btnClicked;
+                this.content = content;
+                this.title = title;
+            }
         }
     }
 }

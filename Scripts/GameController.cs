@@ -144,7 +144,6 @@ namespace Assets.Scripts
             Gui.DisplayCreatedTextureQuad.SetActive(true);
             Gui.RenderCamera.gameObject.SetActive(true);
             Gui.ResetBufferQuad.SetActive(true);
-           // Gui.RenderCamera.Render();
             yield return new WaitForSeconds(0.02f);
             Gui.ResetBufferQuad.SetActive(false);
 //            for (int i = 0; i < TimeBeforeMove; i++)
@@ -152,16 +151,6 @@ namespace Assets.Scripts
                 Gui.MatchStartAudio.Play();
                 yield return new WaitForSeconds(1f);
             }
-
-
-            /*            if (!firstPlayStarted)
-                        {
-                            Color c = Gui.PanelMain.GetComponent<Image>().color;
-                            Color newColor = new Color(c.r, c.g, c.b, 0.6f);
-                            Gui.PanelMain.GetComponent<Image>().color = newColor;
-                        }*/
-            //  texture.DiscardContents();
-            //firstPlayStarted = true;
             audioSource.clip = Gui.BackgroundClips[UnityEngine.Random.Range(0, Gui.BackgroundClips.Count)];
             audioSource.Play();
             Wd.EventLogGamePlayInfo("Match Start - Players Count " + players.Count + " | " + Master.Instance.MatchData.RoundsCount, players.Count);
@@ -190,11 +179,6 @@ namespace Assets.Scripts
             Gui.FinishText.gameObject.SetActive(true);
             //calc percent
             StartCoroutine(CalculatePercents());
-        }
-
-
-        private void FixedUpdate()
-        {
         }
 
         public float Clamp(float x, bool left)
@@ -226,18 +210,6 @@ namespace Assets.Scripts
             }
         }
 
-
-        /* private void StartGame()
-        {
-            Gui.DrawingObject.Prepare();
-            GameObject go = (GameObject) Instantiate(Gui.PlayerPrefab.gameObject, startPositions[0].transform.position, Quaternion.identity);
-            Player p = go.GetComponent<Player>();
-            players.Add(p);
-            GameState = GameStates.Playing;
-            Gui.StateText.text = GameState.ToString();
-        }*/
-
-
         public List<Player> GetPlayers()
         {
             return players;
@@ -260,20 +232,7 @@ namespace Assets.Scripts
             }
         }
 
-//        void OnPostRender()
-//        {
-//            Debug.Log("render");
-//            if (saveGraphic)
-//            {
-//                saveGraphic = false;
-//                tex = new Texture2D(TextureSize.X, TextureSize.Y, TextureFormat.RGB24, false);
-//                tex.ReadPixels(TextureSize.GetRect(), 0, 0);
-//                tex.Apply();
-//            }
-//        }
-
         [SerializeField] private Texture2D tex;
-        [SerializeField] private List<PP> pp = new List<PP>();
 
         private IEnumerator CalculatePercents()
         {
@@ -314,27 +273,8 @@ namespace Assets.Scripts
                 {
                     points[ind]++;
                 }
-
-//
-//                PP p = PP.Contain(c, pp);
-//                if (p == null)
-//                {
-//                    pp.Add(new PP() {Color = c, Count = 0});
-//                }
-//                else
-//                {
-//                    p.Count++;
-//                }
             }
             yield return null;
-//
-//            Wd.Log("Before sort", this);
-//            yield return null;
-//
-//      
-//            pp = pp.OrderByDescending(o => o.Count).Where(o => (o.Count > 150000)).ToList();
-//
-//            Wd.Log("After sort", this);
 
             int sum = 0;
             for (int i = 0; i < points.Length; i++)
@@ -342,18 +282,6 @@ namespace Assets.Scripts
                 sum += points[i];
             }
             Wd.Log("pixels: " + pixs.Length + " | sum: " + sum, this);
-            string s = "";
-//            for (int i = 0; i < 25; i++)
-//            {
-//                s += ("-- col[" + i + "]: " + pixs[i].ToString() + "\n");
-//            }
-//            string s2 = "";
-//            for (int i = 0; i < 25 && i < pp.Count; i++)
-//            {
-//                s2 += "\n -- list: " + pp[i].Count + " | " + pp[i].Color;
-//            }
-//            Wd.Log(s, this);
-//            Wd.Log(s2, this);
             int winnerIndex = 0;
             float winner = points[0];
             for (int i = 0; i < points.Length; i++)
@@ -381,7 +309,6 @@ namespace Assets.Scripts
                     return i;
                 }
             }
-            //Wd.LogErr("Player with color not found", this);
             return -1;
         }
 
@@ -398,23 +325,6 @@ namespace Assets.Scripts
                 }
             }
             return false;
-        }
-    }
-
-    [Serializable]
-    public class PP
-    {
-        public Color32 Color;
-        public int Count;
-
-        public static PP Contain(Color32 color, List<PP> list)
-        {
-            foreach (var pp in list)
-            {
-                if (GameController.CompareApproxColors32(pp.Color, color))
-                    return pp;
-            }
-            return null;
         }
     }
 }

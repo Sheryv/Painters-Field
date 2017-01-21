@@ -24,10 +24,8 @@ namespace Assets.Scripts
         private AudioListener audioListener;
         private float counter;
         private bool aiMoveForced = false;
-        // public Color PlayerColor;
-        // public Color PlayerBackgroundColor;
+
         public float Speed;
-        //        public float RotationSpeed;
         public int PlayerId;
         public float LastPercent;
         public PlayerPattern Pattern;
@@ -179,15 +177,7 @@ namespace Assets.Scripts
                 {
                     h = 1f;
                 }
-            //    Debug.Log(transform.up);
-//                if (transform.up.y > 0) //going up
-//                {
-//                    h = -1f;
-//                }
-//                else
-//                {
-//                    h = 1f;
-//                }
+
                 aiMoveForced = true;
                 direction = h;
                 counter = 1f;
